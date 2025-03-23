@@ -2,12 +2,14 @@ export class CreateJournalDto {
   title: string;
   content: string;
   tags: string[];
+  description: string;
   createdAt: Date;
 
   constructor() {
     this.title = '';
     this.content = '';
     this.tags = [];
+    this.description = '';
     this.createdAt = new Date();
   }
 }

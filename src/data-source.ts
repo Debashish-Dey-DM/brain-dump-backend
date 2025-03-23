@@ -11,7 +11,7 @@ const AppDataSource = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  synchronize: false, // Must be false for migrations
+  synchronize: true, // Must be false for migrations
   logging: true,
   entities: ['dist/**/*.entity.js'], // Adjust for compiled files
   migrations: ['dist/migrations/*.js'],

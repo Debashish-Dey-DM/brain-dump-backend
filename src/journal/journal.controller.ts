@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { JournalService } from './journal.service';
 import { CreateJournalDto, UpdateJournalDto } from './journal.dto';
 
-@Controller('journal')
+@Controller('journals')
 export class JournalController {
   constructor(private readonly journalService: JournalService) {}
 
