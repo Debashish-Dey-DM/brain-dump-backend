@@ -12,9 +12,20 @@ export class JournalTagMigration1741393086208 implements MigrationInterface {
         name: 'journal',
         columns: [
           { name: 'id', type: 'serial', isPrimary: true },
-          { name: 'name', type: 'varchar', length: '255', isNullable: false },
+          { name: 'title', type: 'varchar', length: '255', isNullable: false },
+          {
+            name: 'description',
+            type: 'varchar',
+            length: '255',
+            isNullable: false,
+          },
           { name: 'content', type: 'text', isNullable: false },
-          { name: 'status', type: 'varchar', length: '50', default: "'draft'" },
+          {
+            name: 'status',
+            type: 'varchar',
+            length: '50',
+            default: "'active'",
+          },
         ],
       }),
     );

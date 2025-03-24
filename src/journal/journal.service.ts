@@ -16,7 +16,11 @@ export class JournalService {
   ) {}
   async createJournal(journal: CreateJournalDto): Promise<Journal> {
     try {
-      return await this.journalRepository.save(journal);
+      const newJournal = this.journalRepository.create(journal);
+      console.log(newJournal);
+      const respinse = await this.journalRepository.save(newJournal);
+      console.log(respinse);
+      return newJournal;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }

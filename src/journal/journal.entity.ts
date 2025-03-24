@@ -17,8 +17,14 @@ export class Journal {
   @Column()
   content!: string;
 
+  @Column()
+  description!: string;
+
   @Column('text', { array: true })
   tags!: string[];
+
+  @Column({ default: true })
+  status!: 'active' | 'inactive' | 'pending';
 
   @CreateDateColumn()
   createdAt!: Date;
