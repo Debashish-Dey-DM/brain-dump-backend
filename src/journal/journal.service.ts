@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Brackets } from 'typeorm';
 import { Journal } from './journal.entity';
 import { CreateJournalDto, UpdateJournalDto } from './journal.dto';
 @Injectable()
@@ -43,6 +43,70 @@ export class JournalService {
         throw new BadRequestException('Journal not found');
       }
       return journal;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+  async getJournalsByTagsExcludingId(tags: string[], excludeId: number) {
+    const queryBuilder = this.journalRepository.createQueryBuilder('journal');
+    queryBuilder.where('journal.id != :excludeId', { excludeId });
+    queryBuilder.andWhere(
+      new Brackets((qb) => {
+        tags.forEach((tag, i) => {
+          qb.orWhere(`journal.tags @> :tag${i}`, { [`tag${i}`]: [tag] });
+        });
+      }),
+    );
+    queryBuilder.orderBy('journal.createdAt', 'DESC');
+    queryBuilder.take(5);
+    return await queryBuilder.getMany();
+  }
+  // Get recent 3 journals
+  async getRecentJournals(): Promise<Journal[]> {
+    try {
+      console.log('Fetching recent journals');
+
+      const recentJournals = await this.journalRepository
+        .createQueryBuilder('journal')
+        .orderBy('journal.createdAt', 'DESC')
+        .take(3)
+        .getMany();
+
+      if (!recentJournals || recentJournals.length === 0) {
+        throw new BadRequestException('No recent journals found');
+      }
+
+      return recentJournals;
+    } catch (error) {
+      console.error('Error in getRecentJournals:', error);
+      throw new InternalServerErrorException('Failed to fetch recent journals');
+    }
+  }
+  async getAllTags(): Promise<string[]> {
+    try {
+      const journals = await this.journalRepository.find();
+      if (!journals) {
+        throw new BadRequestException('No journals found');
+      }
+      const tags = journals
+        .map((journal) => journal.tags)
+        .flat()
+        .filter((tag, index, self) => self.indexOf(tag) === index);
+      return tags;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+  async getJournalByTag(tag: string): Promise<Journal[]> {
+    try {
+      const journals = await this.journalRepository
+        .createQueryBuilder('journal')
+        .where(':tag = ANY(journal.tags)', { tag })
+        .getMany();
+      if (!journals) {
+        throw new BadRequestException('No journals found');
+      }
+      return journals;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
